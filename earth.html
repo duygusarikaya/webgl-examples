@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script type="text/javascript" src="scripts/three.min.js"></script>
+	<script type="text/javascript" src="scripts/OrbitControls.js"></script>
+</head>
+<body style="margin: 0;padding: 0">
+<script type="text/javascript">
+
+//three things for the scene to be rendered are
+var scene;
+var camera;
+var renderer;
+
+var cameraControl;
+
+function createRenderer() {
+	renderer = new THREE.WebGLRenderer();
+	renderer.setClearColor(0x000000, 1.0); //black
+	renderer.setSize(window.innerWidth, window.innerHeight);
+	renderer.shadowMap.enabled = true;
+}
+
+function createCamera() {
+	camera = new THREE.PerspectiveCamera(
+		45,										//field of view
+		window.innerWidth / window.innerHeight,	//aspect ratio
+		0.1, 1000);								//far & near clip planes
+
+	camera.position.x = 90;
+	camera.position.y = 32;
+	camera.position.z = 32;
+
+	camera.lookAt(scene.position);
+
+	cameraControl = new THREE.OrbitControls(camera); //allows mouse interaction
+}
+
+function createLight() {
+	var directionalLight = new THREE.DirectionalLight(0xffffff, 1); //white
+	directionalLight.position.set(100, 10, -50);
+	directionalLight.name = 'directional';
+
+	scene.add(directionalLight);
+
+	var ambientLight = new THREE.AmbientLight(0x222222);
+	ambientLight.name = 'ambient';
+
+	scene.add(ambientLight);
+}
+
+function createEarthMaterial() {
+	var earthTexture = new THREE.Texture();
+	var loader = new THREE.ImageLoader();
+	loader.load('assets/earthmap2k.jpg', function(image) {
+		earthTexture.image = image;
+		earthTexture.needsUpdate = true;
+	});
+
+	var normalTexture = new THREE.Texture();
+	var loader = new THREE.ImageLoader();
+	loader.load('assets/earth_normalmap_flat2k.jpg', function(image) {
+		normalTexture.image = image;
+		normalTexture.needsUpdate = true;
+	});
+
+	var specularTexture = new THREE.Texture();
+	var loader = new THREE.ImageLoader();
+	loader.load('assets/earthspec2k.jpg', function(image) {
+		specularTexture.image = image;
+		specularTexture.needsUpdate = true;
+	});
+
+	var earthMaterial = new THREE.MeshPhongMaterial();
+	earthMaterial.map = earthTexture;
+
+	earthMaterial.normalMap = normalTexture;
+	earthMaterial.normalScale = new THREE.Vector2(0.7, 0.7);
+
+	earthMaterial.specularMap = specularTexture;
+	earthMaterial.specular = new THREE.Color(0x262626);
+
+	return earthMaterial;
+}
+
+function createEarth() {
+	var sphereGeometry = new THREE.SphereGeometry(15, 30, 30);
+	var sphereMaterial = createEarthMaterial();
+	var earth = new THREE.Mesh(sphereGeometry, sphereMaterial);
+	earth.name = 'earth';
+
+	scene.add(earth);
+}
+
+function createAtmosphere() {
+	var sphereGeometry = new THREE.SphereGeometry(15.1, 30, 30); //slightly bigger than earth
+	var atmosphereTexture = new THREE.Texture();
+	var loader = new THREE.ImageLoader();
+	loader.load('assets/fair_clouds_1k.png', function(image) {
+		atmosphereTexture.image = image;
+		atmosphereTexture.needsUpdate = true;
+	});
+
+	var atmosphereMaterial = new THREE.MeshPhongMaterial();
+	atmosphereMaterial.map = atmosphereTexture;
+	atmosphereMaterial.transparent = true;
+
+	var atmosphereMesh = new THREE.Mesh(sphereGeometry, atmosphereMaterial);
+	atmosphereMesh.name = 'clouds';
+
+	scene.add(atmosphereMesh);
+}
+
+function createSpace() {
+	var sphereGeometry = new THREE.SphereGeometry(90, 30, 30); //a lot bigger than earth
+	var spaceTexture = new THREE.Texture();
+	var loader = new THREE.ImageLoader();
+	loader.load('assets/galaxy_starfield.png', function(image) {
+		spaceTexture.image = image;
+		spaceTexture.needsUpdate = true;
+	});
+
+	var spaceMaterial = new THREE.MeshBasicMaterial();
+	spaceMaterial.map = spaceTexture;
+	//will have texture inside the sphere
+	spaceMaterial.side = THREE.BackSide;
+
+	var space = new THREE.Mesh(sphereGeometry, spaceMaterial);
+	space.name = 'space';
+	scene.add(space);
+}
+
+function init() {
+
+	scene = new THREE.Scene();
+
+	createRenderer();
+	createCamera();
+	createLight();
+
+	createEarth();
+	createAtmosphere();
+	createSpace();
+
+	document.body.appendChild(renderer.domElement);
+
+	render();
+}
+
+function render() {
+
+	cameraControl.update();
+
+	scene.getObjectByName('earth').rotation.y += 0.0005;
+	scene.getObjectByName('clouds').rotation.y += 0.0005;
+
+	renderer.render(scene, camera);
+	requestAnimationFrame(render); //browser calls render() for each redraw
+}
+
+init();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script type="text/javascript" src="scripts/three.min.js"></script>
+	<script type="text/javascript" src="scripts/OrbitControls.js"></script>
+	<script type="text/javascript" src="scripts/OBJLoader.js"></script>
+</head>
+<body style="margin: 0;padding: 0">
+<script type="text/javascript">
+
+//three things for the scene to be rendered are
+var scene;
+var camera;
+var renderer;
+
+var cameraControl;
+
+function createRenderer() {
+	renderer = new THREE.WebGLRenderer();
+	renderer.setClearColor(0x000000, 1.0); //black
+	renderer.setSize(window.innerWidth, window.innerHeight);
+	renderer.shadowMap.enabled = true;
+}
+
+function createCamera() {
+	camera = new THREE.PerspectiveCamera(
+		45,										//field of view
+		window.innerWidth / window.innerHeight,	//aspect ratio
+		0.1, 1000);								//far & near clip planes
+
+	camera.position.x = 15;
+	camera.position.y = 16;
+	camera.position.z = 23;
+
+	camera.lookAt(scene.position);
+
+	cameraControl = new THREE.OrbitControls(camera); //allows mouse interaction
+}
+
+function createLight() {
+	var spotLight = new THREE.SpotLight(0xffffff);
+	spotLight.position.set(10, 40, 20);
+	spotLight.shadowCameraNear = 20;
+	spotLight.shadowCameraFar = 50;
+	spotLight.castShadow = true;
+	spotLight.shadowMapWidht = 2048;
+	spotLight.shadowMapHeight = 2048;
+
+	scene.add(spotLight);
+}
+
+function loadModule() {
+
+	var texture = new THREE.Texture();
+	var loader = new THREE.ImageLoader();
+	loader.load('assets/lee_diffuse.jpg', function(image) {
+		texture.image = image;
+		texture.needsUpdate = true;
+	});
+
+	var normalTexture = new THREE.Texture();
+	var loader = new THREE.ImageLoader();
+	loader.load('assets/lee_normal_tangent.jpg', function(image) {
+		normalTexture.image = image;
+		normalTexture.needsUpdate = true;
+	});
+
+	var material = new THREE.MeshPhongMaterial({
+		specular: 0x222222,
+		shininess: 35,
+		map: texture,
+		normalMap: normalTexture,
+		normalScale: new THREE.Vector2(0.8, 0.8)
+	});
+
+	var objLoader = new THREE.OBJLoader();
+	objLoader.load('assets/lee.obj', function(object) {
+		object.traverse(function(child) { //traverse each mesh since file can contain several mesh(es?)
+			if (child instanceof THREE.Mesh) {
+				child.material = material;
+				child.position.y -= 10;
+				child.receiveShadow = true;
+				child.castShadow = true;
+			}
+		});
+		scene.add(object);
+	});
+}
+
+
+function init() {
+
+	scene = new THREE.Scene();
+
+	createRenderer();
+	createCamera();
+	createLight();
+
+	loadModule();
+
+	document.body.appendChild(renderer.domElement);
+
+	render();
+}
+
+function render() {
+
+	cameraControl.update();
+
+	renderer.render(scene, camera);
+	requestAnimationFrame(render); //browser calls render() for each redraw
+}
+
+init();
+
+</script>
+</body>
+</html>
