@@ -101,12 +101,6 @@ function createTable()  {
 	**/
 
 	var tableGeometry = new THREE.CubeGeometry(planeWidth * 1.05, planeHeight * 1.03, 100);
-	var texture = new THREE.Texture();
-	var loader = new THREE.ImageLoader();
-	loader.load('assets/wood_dark.jpg', function(image) {
-		texture.image = image;
-		texture.needsUpdate = true;
-	});
 
 	var tableMaterial = new THREE.MeshPhongMaterial({
 		//map: texture
@@ -123,12 +117,6 @@ function createTable()  {
 
 function createFloor()  {
 	var planeGeometry = new THREE.CubeGeometry(1000, 1000, 5);
-	var texture = new THREE.Texture();
-	var loader = new THREE.ImageLoader();
-	loader.load('assets/wood_floor.jpg', function(image) {
-		texture.image = image;
-		texture.needsUpdate = true;
-	});
 
 	var planeMaterial = new THREE.MeshLambertMaterial({
 		//map: texture
