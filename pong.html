@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+  <head>
+		<title>Game</title>
+		<style>
+			body {
+				background-color: black;
+			}
+			#gameCanvas {
+				background-color: black;
+				width: 640px;
+				height: 360px;
+				margin: auto;
+				align: center;
+			}
+			#scoreboard {
+				text-align: center;
+				font-family: Segoe UI, Helvetica, Ubuntu, sans-serif;
+				color: white;
+			}
+			#scores {
+				font-size:500%; 
+				padding:0; 
+				margin:0;
+				color: white;
+			}
+			
+		</style>
+		<script src='./Scripts/three.min.js'></script>
+		<script src='./Scripts/keyboard.js'></script>
+		<script src='./Scripts/pong.game.js'></script>
+	</head>
+	<body onload='init();'>
+		
+		<div id='scoreboard'>
+			<h2 id='gameInfo'>Score 7 to win!</h2>
+			<h1 id='scores'>0-0</h1>
+			<div id='gameCanvas'></div>
+			<h3>Left arrow / A to move left
+			<br>Right arrow / D to move right</h3>
+		</div>
+
+		
+	</body>
+</html>
